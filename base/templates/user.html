@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Categories</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 40px;
+      }
+
+      .categories {
+        display: flex;
+        gap: 30px;
+      }
+
+      .category-box {
+        background-color: #00bfff;
+        width: 150px;
+        height: 150px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        color: #fff;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .category-box:hover {
+        transform: translateY(-8px);
+      }
+
+      /* Popup Styling */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .popup-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .popup-content h2 {
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        color: #333;
+      }
+
+      .popup-content input {
+        width: 90%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .popup-content button {
+        padding: 10px 20px;
+        background-color: #00bfff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .popup-content button:hover {
+        background-color: #007acc;
+      }
+
+      .close-popup {
+        background-color: #ff4d4d;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Select a Category</h1>
+    <div class="categories">
+      <div class="category-box" onclick="openPopup('student')">Student</div>
+      <div class="category-box" onclick="openPopup('teacher')">Teacher</div>
+      <div class="category-box" onclick="openPopup('admin')">Admin</div>
+    </div>
+
+    <!-- Popup Overlay -->
+    <div id="popupOverlay" class="popup-overlay">
+      <div class="popup-content" id="popupContent">
+        <!-- Dynamic Content Goes Here -->
+      </div>
+    </div>
+
+    <script>
+      function openPopup(role) {
+        const popupOverlay = document.getElementById("popupOverlay");
+        const popupContent = document.getElementById("popupContent");
+
+        if (role === "student") {
+          popupContent.innerHTML = `
+                    <h2>Student Login</h2>
+                    <input type="text" id="studentName" placeholder="Enter your name" required>
+                    <button onclick="submitForm('student')">Submit</button>
+                    <button class="close-popup" onclick="closePopup()">Close</button>
+                `;
+        } else if (role === "teacher") {
+          popupContent.innerHTML = `
+                    <h2>Teacher Login</h2>
+                    <input type="text" id="teacherUsername" placeholder="Enter your username" required>
+                    <input type="password" id="teacherPassword" placeholder="Enter your password" required>
+                    <button onclick="submitForm('teacher')">Login</button>
+                    <button class="close-popup" onclick="closePopup()">Close</button>
+                `;
+        } else if (role === "admin") {
+          popupContent.innerHTML = `
+                    <h2>Admin Login</h2>
+                    <input type="text" id="adminUsername" placeholder="Enter your username" required>
+                    <input type="password" id="adminPassword" placeholder="Enter your password" required>
+                    <button onclick="submitForm('admin')">Login</button>
+                    <button class="close-popup" onclick="closePopup()">Close</button>
+                `;
+        }
+
+        popupOverlay.style.display = "flex";
+      }
+
+      function closePopup() {
+        document.getElementById("popupOverlay").style.display = "none";
+      }
+
+      function submitForm(role) {
+        if (role === "student") {
+          const studentName = document.getElementById("studentName").value;
+          alert(`Welcome, ${studentName}!`);
+        } else if (role === "teacher") {
+          const teacherUsername =
+            document.getElementById("teacherUsername").value;
+          const teacherPassword =
+            document.getElementById("teacherPassword").value;
+          alert(
+            `Teacher Login: Username: ${teacherUsername}, Password: ${teacherPassword}`,
+          );
+        } else if (role === "admin") {
+          const adminUsername = document.getElementById("adminUsername").value;
+          const adminPassword = document.getElementById("adminPassword").value;
+          alert(
+            `Admin Login: Username: ${adminUsername}, Password: ${adminPassword}`,
+          );
+        }
+
+        closePopup();
+      }
+    </script>
+  </body>
+</html>
