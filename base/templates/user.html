@@ -6,20 +6,21 @@
     <title>User Categories</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f8ff;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        background-color: #e0f7fa;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 100vh;
         margin: 0;
+        color: #333;
       }
 
       h1 {
-        color: #333;
-        font-size: 2.5rem;
+        font-size: 3rem;
         margin-bottom: 40px;
+        color: #00796b;
       }
 
       .categories {
@@ -28,22 +29,61 @@
       }
 
       .category-box {
-        background-color: #00bfff;
-        width: 150px;
-        height: 150px;
+        background-color: #009688;
+        width: 160px;
+        height: 160px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         color: #fff;
-        border-radius: 15px;
+        border-radius: 20px;
         cursor: pointer;
-        transition: transform 0.3s ease;
-        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, background-color 0.3s ease,
+          box-shadow 0.3s ease;
+        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+        animation: pop-in 0.5s ease forwards;
+      }
+
+      @keyframes pop-in {
+        from {
+          transform: scale(0);
+        }
+        to {
+          transform: scale(1);
+        }
       }
 
       .category-box:hover {
-        transform: translateY(-8px);
+        transform: scale(1.1);
+        background-color: #00796b;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .category-box::after {
+        content: "";
+        position: absolute;
+        width: 300%;
+        height: 300%;
+        background: rgba(255, 255, 255, 0.3);
+        top: 50%;
+        left: 50%;
+        border-radius: 50%;
+        transition: width 0.5s ease, height 0.5s ease;
+        z-index: 0;
+        transform: translate(-50%, -50%) scale(0);
+      }
+
+      .category-box:hover::after {
+        width: 0;
+        height: 0;
+      }
+
+      .category-box span {
+        position: relative;
+        z-index: 1;
       }
 
       /* Popup Styling */
@@ -66,12 +106,24 @@
         width: 300px;
         text-align: center;
         box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+        animation: fade-in 0.5s ease forwards;
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .popup-content h2 {
         margin-bottom: 20px;
-        font-size: 1.5rem;
-        color: #333;
+        font-size: 1.8rem;
+        color: #00796b;
       }
 
       .popup-content input {
@@ -80,33 +132,51 @@
         margin-bottom: 15px;
         border: 1px solid #ccc;
         border-radius: 5px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+
+      .popup-content input:focus {
+        border-color: #009688;
       }
 
       .popup-content button {
         padding: 10px 20px;
-        background-color: #00bfff;
+        background-color: #009688;
         color: white;
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        margin: 5px 0;
       }
 
       .popup-content button:hover {
-        background-color: #007acc;
+        background-color: #00796b;
+        transform: scale(1.05);
       }
 
       .close-popup {
         background-color: #ff4d4d;
-        margin-top: 10px;
+      }
+
+      .close-popup:hover {
+        background-color: #ff3d3d;
       }
     </style>
   </head>
   <body>
     <h1>Select a Category</h1>
     <div class="categories">
-      <div class="category-box" onclick="openPopup('student')">Student</div>
-      <div class="category-box" onclick="openPopup('teacher')">Teacher</div>
-      <div class="category-box" onclick="openPopup('admin')">Admin</div>
+      <div class="category-box" onclick="openPopup('student')">
+        <span>Student</span>
+      </div>
+      <div class="category-box" onclick="openPopup('teacher')">
+        <span>Teacher</span>
+      </div>
+      <div class="category-box" onclick="openPopup('admin')">
+        <span>Admin</span>
+      </div>
     </div>
 
     <!-- Popup Overlay -->
@@ -154,9 +224,14 @@
       }
 
       function submitForm(role) {
+        let url;
+        let data;
+
         if (role === "student") {
           const studentName = document.getElementById("studentName").value;
           alert(`Welcome, ${studentName}!`);
+          closePopup(); // Close popup after submission
+          return;
         } else if (role === "teacher") {
           const teacherUsername =
             document.getElementById("teacherUsername").value;
@@ -165,15 +240,57 @@
           alert(
             `Teacher Login: Username: ${teacherUsername}, Password: ${teacherPassword}`,
           );
+          closePopup(); // Close popup after submission
+          return;
         } else if (role === "admin") {
           const adminUsername = document.getElementById("adminUsername").value;
           const adminPassword = document.getElementById("adminPassword").value;
-          alert(
-            `Admin Login: Username: ${adminUsername}, Password: ${adminPassword}`,
-          );
+          data = {
+            username: adminUsername,
+            password: adminPassword,
+          };
+          url = "/admin/login/";
         }
 
+        // Send the login request to the Django backend
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              window.location.href = "/admin/panel/";
+            } else {
+              alert("Login failed: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
         closePopup();
+      }
+
+      // Function to get CSRF token
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Check if this cookie string begins with the name we want
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1),
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
       }
     </script>
   </body>
