@@ -212,56 +212,6 @@
         document.getElementById("popupOverlay").style.display = "none";
       }
 
-      async function submitForm(role) {
-        let formId = "";
-        if (role === "student") {
-          formId = "studentForm";
-        }
-
-        const form = document.getElementById(formId);
-
-        if (!form.checkValidity()) {
-          displayErrors(form);
-          return;
-        }
-
-        const formData = new FormData(form);
-
-        // Get the CSRF token from the cookie
-        const csrfToken = getCookie("csrftoken"); // Change 'csrftoken' to your actual cookie name if different
-
-        try {
-          const response = await fetch(`/admin/login/`, {
-            method: "POST",
-            body: formData,
-            headers: {
-              "X-CSRFToken": csrfToken, // Use the CSRF token here
-            },
-          });
-
-          if (response.ok) {
-            alert(`${role} form submitted successfully!`);
-            closePopup();
-          } else {
-            alert(`Error submitting ${role} form. Please try again.`);
-          }
-        } catch (error) {
-          alert(`Network error: ${error}`);
-        }
-      }
-
-      function displayErrors(form) {
-        const inputs = form.querySelectorAll("input[required]");
-        inputs.forEach((input) => {
-          const errorElement = document.getElementById(`${input.name}Error`);
-          if (!input.value.trim()) {
-            errorElement.style.display = "inline";
-          } else {
-            errorElement.style.display = "none";
-          }
-        });
-      }
-
       function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== "") {

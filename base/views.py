@@ -39,7 +39,7 @@ def admin_login(request):
             if user is not None and user.password == password:  # Use custom password checking
                 if user.role.id == 3:  # Check if user is an Admin
                     print('work3')
-                    return JsonResponse({'success': True})
+                    return JsonResponse({'success': True, 'redirect_url': '/category/'})
                 else:
                     print('User is not an admin')  # Debugging line
                     return JsonResponse({'success': False, 'message': 'User is not an admin'})
