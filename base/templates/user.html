@@ -171,10 +171,10 @@
       <div class="category-box" onclick="openPopup('student')">
         <span>Student</span>
       </div>
-      <div class="category-box" onclick="openPopup('teacher')">
+      <div class="category-box" onclick="window.location.href='login.html'">
         <span>Teacher</span>
       </div>
-      <div class="category-box" onclick="openPopup('admin')">
+      <div class="category-box" onclick="window.location.href='/login'">
         <span>Admin</span>
       </div>
     </div>
@@ -191,31 +191,20 @@
         const popupOverlay = document.getElementById("popupOverlay");
         const popupContent = document.getElementById("popupContent");
 
+        let formHTML = "";
+
         if (role === "student") {
-          popupContent.innerHTML = `
-                    <h2>Student Login</h2>
-                    <input type="text" id="studentName" placeholder="Enter your name" required>
-                    <button onclick="submitForm('student')">Submit</button>
-                    <button class="close-popup" onclick="closePopup()">Close</button>
-                `;
-        } else if (role === "teacher") {
-          popupContent.innerHTML = `
-                    <h2>Teacher Login</h2>
-                    <input type="text" id="teacherUsername" placeholder="Enter your username" required>
-                    <input type="password" id="teacherPassword" placeholder="Enter your password" required>
-                    <button onclick="submitForm('teacher')">Login</button>
-                    <button class="close-popup" onclick="closePopup()">Close</button>
-                `;
-        } else if (role === "admin") {
-          popupContent.innerHTML = `
-                    <h2>Admin Login</h2>
-                    <input type="text" id="adminUsername" placeholder="Enter your username" required>
-                    <input type="password" id="adminPassword" placeholder="Enter your password" required>
-                    <button onclick="submitForm('admin')">Login</button>
-                    <button class="close-popup" onclick="closePopup()">Close</button>
-                `;
+          formHTML = `
+            <h2>Student Login</h2>
+            <form id="studentForm">
+              <input type="text" name="studentName" placeholder="Enter your name" required>
+              <span class="error" id="studentError" style="color:red;display:none;">Please enter your name</span>
+              <button type="button" onclick="submitForm('student')">Submit</button>
+              <button class="close-popup" type="button" onclick="closePopup()">Close</button>
+            </form>`;
         }
 
+        popupContent.innerHTML = formHTML;
         popupOverlay.style.display = "flex";
       }
 
@@ -223,58 +212,56 @@
         document.getElementById("popupOverlay").style.display = "none";
       }
 
-      function submitForm(role) {
-        let url;
-        let data;
-
+      async function submitForm(role) {
+        let formId = "";
         if (role === "student") {
-          const studentName = document.getElementById("studentName").value;
-          alert(`Welcome, ${studentName}!`);
-          closePopup(); // Close popup after submission
-          return;
-        } else if (role === "teacher") {
-          const teacherUsername =
-            document.getElementById("teacherUsername").value;
-          const teacherPassword =
-            document.getElementById("teacherPassword").value;
-          alert(
-            `Teacher Login: Username: ${teacherUsername}, Password: ${teacherPassword}`,
-          );
-          closePopup(); // Close popup after submission
-          return;
-        } else if (role === "admin") {
-          const adminUsername = document.getElementById("adminUsername").value;
-          const adminPassword = document.getElementById("adminPassword").value;
-          data = {
-            username: adminUsername,
-            password: adminPassword,
-          };
-          url = "/admin/login/";
+          formId = "studentForm";
         }
 
-        // Send the login request to the Django backend
-        fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              window.location.href = "/admin/panel/";
-            } else {
-              alert("Login failed: " + data.message);
-            }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
+        const form = document.getElementById(formId);
+
+        if (!form.checkValidity()) {
+          displayErrors(form);
+          return;
+        }
+
+        const formData = new FormData(form);
+
+        // Get the CSRF token from the cookie
+        const csrfToken = getCookie("csrftoken"); // Change 'csrftoken' to your actual cookie name if different
+
+        try {
+          const response = await fetch(`/admin/login/`, {
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-CSRFToken": csrfToken, // Use the CSRF token here
+            },
           });
-        closePopup();
+
+          if (response.ok) {
+            alert(`${role} form submitted successfully!`);
+            closePopup();
+          } else {
+            alert(`Error submitting ${role} form. Please try again.`);
+          }
+        } catch (error) {
+          alert(`Network error: ${error}`);
+        }
       }
 
-      // Function to get CSRF token
+      function displayErrors(form) {
+        const inputs = form.querySelectorAll("input[required]");
+        inputs.forEach((input) => {
+          const errorElement = document.getElementById(`${input.name}Error`);
+          if (!input.value.trim()) {
+            errorElement.style.display = "inline";
+          } else {
+            errorElement.style.display = "none";
+          }
+        });
+      }
+
       function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== "") {
@@ -290,6 +277,7 @@
             }
           }
         }
+        console.log(cookieValue);
         return cookieValue;
       }
     </script>
