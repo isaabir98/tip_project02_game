@@ -88,9 +88,25 @@
       .category-box:hover.division {
         background-color: #b0e0e6;
       }
+
+      /* Remove underline from links */
+      a {
+        text-decoration: none;
+        color: inherit; /* Ensure link color inherits from the parent element */
+      }
+
+      /* Optional: Add hover effect for links */
+      a:hover {
+        color: #fff; /* Change link color on hover if desired */
+      }
     </style>
   </head>
   <body>
+    {% if student_name %}
+    <p>Welcome, {{ student_name }}!</p>
+    {% else %}
+    <p>No student name provided.</p>
+    {% endif %}
     <h1>Choose a Category</h1>
     <div class="categories">
       <div class="category-box multiplication">
@@ -110,14 +126,11 @@
     </div>
 
     <script>
-      // Add click event handler if needed for future routing
-      document.querySelectorAll(".category-box").forEach((box) => {
-        box.addEventListener("click", function () {
-          const category = this.textContent.trim();
-          console.log(`${category} clicked`);
-          // You can add navigation to other pages here
-        });
-      });
+      // Function to set the category and submit the form
+      function selectCategory(category) {
+        document.getElementById("selectedCategory").value = category;
+        document.getElementById("categoryForm").submit();
+      }
     </script>
   </body>
 </html>

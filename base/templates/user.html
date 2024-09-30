@@ -171,7 +171,7 @@
       <div class="category-box" onclick="openPopup('student')">
         <span>Student</span>
       </div>
-      <div class="category-box" onclick="window.location.href='login.html'">
+      <div class="category-box" onclick="window.location.href='/login'">
         <span>Teacher</span>
       </div>
       <div class="category-box" onclick="window.location.href='/login'">
@@ -196,10 +196,11 @@
         if (role === "student") {
           formHTML = `
             <h2>Student Login</h2>
-            <form id="studentForm">
-              <input type="text" name="studentName" placeholder="Enter your name" required>
+            <form  method="POST" action="{% url 'game_view' %}">
+              {% csrf_token %}
+              <input type="text" id="studentName" name="studentName" placeholder="Enter your name" required>
               <span class="error" id="studentError" style="color:red;display:none;">Please enter your name</span>
-              <button type="button" onclick="submitForm('student')">Submit</button>
+             <button type="submit">Submit</button>
               <button class="close-popup" type="button" onclick="closePopup()">Close</button>
             </form>`;
         }
@@ -210,6 +211,11 @@
 
       function closePopup() {
         document.getElementById("popupOverlay").style.display = "none";
+      }
+
+      function getStudentDetails(type) {
+        const studentName = document.getElementById("studentName").value;
+        console.log(studentName);
       }
 
       function getCookie(name) {

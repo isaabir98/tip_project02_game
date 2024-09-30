@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Game</title>
+    <style>
+      body {
+        background-color: #ffeb3b;
+        font-family: "Comic Sans MS", sans-serif;
+        text-align: center;
+        padding: 50px;
+      }
+
+      h1 {
+        color: #ff5722;
+        font-size: 3rem;
+        text-shadow: 2px 2px #ffccbc;
+        margin-bottom: 30px;
+      }
+
+      .game-container {
+        background-color: #fbe9e7;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .question {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        animation: bounceIn 0.5s ease-out;
+      }
+
+      input[type="text"] {
+        font-size: 1.2rem;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s;
+      }
+
+      input[type="text"]:focus {
+        background-color: #fff3e0;
+      }
+
+      .submit-btn {
+        background-color: #ff5722;
+        color: white;
+        font-size: 1.2rem;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .submit-btn:hover {
+        background-color: #e64a19;
+      }
+
+      .feedback {
+        margin-top: 20px;
+        font-size: 1.2rem;
+      }
+
+      .correct {
+        color: green;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      .incorrect {
+        color: red;
+        animation: shake 0.5s ease;
+      }
+
+      @keyframes bounceIn {
+        from {
+          opacity: 0;
+          transform: scale(0.3);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes shake {
+        0% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        50% {
+          transform: translateX(5px);
+        }
+        75% {
+          transform: translateX(-5px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Quiz Game</h1>
+
+    <div class="game-container">
+      <form method="POST">
+        {% csrf_token %} {% for question in game.questions %}
+        <div class="question">
+          <p>{{ question }}</p>
+          <input type="text" name="answers" required />
+        </div>
+        {% endfor %}
+        <button type="submit" class="submit-btn">Submit Answers</button>
+      </form>
+    </div>
+  </body>
+</html>
