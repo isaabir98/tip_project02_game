@@ -109,27 +109,30 @@
     {% endif %}
     <h1>Choose a Category</h1>
     <div class="categories">
-      <div class="category-box multiplication">
-        <a href="{% url 'game_panel' game_type='multiplication' %}"
-          >Multiplication</a
-        >
+      <div
+        class="category-box multiplication"
+        onclick="selectCategory('multiplication')"
+      >
+        Multiplication
       </div>
-      <div class="category-box addition">
-        <a href="{% url 'game_panel' game_type='addition' %}">Addition</a>
+      <div class="category-box addition" onclick="selectCategory('addition')">
+        Addition
       </div>
-      <div class="category-box subtraction">
-        <a href="{% url 'game_panel' game_type='subtraction' %}">Subtraction</a>
+      <div
+        class="category-box subtraction"
+        onclick="selectCategory('subtraction')"
+      >
+        Subtraction
       </div>
-      <div class="category-box division">
-        <a href="{% url 'game_panel' game_type='division' %}">Division</a>
+      <div class="category-box division" onclick="selectCategory('division')">
+        Division
       </div>
     </div>
 
     <script>
-      // Function to set the category and submit the form
       function selectCategory(category) {
-        document.getElementById("selectedCategory").value = category;
-        document.getElementById("categoryForm").submit();
+        // Redirect to the correct URL based on the category
+        window.location.href = `/game_panel/${category}`;
       }
     </script>
   </body>

@@ -138,7 +138,7 @@
             success: function (response) {
               if (response.success) {
                 // Redirect to another page or show a success message
-                window.location.href = "/category"; // Redirect to homepage
+                window.location.href = response.redirect_url || "/";
               } else {
                 $("#message").text(response.message).css("color", "red");
               }

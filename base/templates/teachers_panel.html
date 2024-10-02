@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teachers Panel</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid black;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Teachers Panel</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Time Taken</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for feedback in feedback_list %}
+        <tr>
+          <td>{{ feedback.student_name }}</td>
+          <td>{{ feedback.time_taken }}</td>
+          <td>{{ feedback.score }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3">No feedback available</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
