@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 from base.forms import UserCreationForm
-from .models import Feedback, Game, User  # Import the User model
+from .models import Feedback, Game, User  
 
 @csrf_exempt
 
@@ -64,8 +64,10 @@ def create_user(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('user')  
-        form = UserCreationForm()
+            return redirect('success_url')  
+    else:
+        form = UserCreationForm()  
+
     return render(request, 'create_user.html', {'form': form})
 
 
@@ -83,23 +85,19 @@ def game_view(request):
 
 
 def game_panel(request, game_type):
-    
     print('work')
     game = get_object_or_404(Game, game_type=game_type.capitalize())
-    
     print(game)
     if request.method == 'POST':
         user_answers = request.POST.getlist('answers')
         print(user_answers)
         correct_answers = game.answers
         feedback = []
-
         for i, (user_answer, correct_answer) in enumerate(zip(user_answers, correct_answers)):
             if user_answer.strip().lower() == correct_answer.lower():
                 feedback.append(f"Question {i+1}: Correct!")
             else:
                 feedback.append(f"Question {i+1}: Incorrect. The correct answer is {correct_answer}.")
-
         return render(request, 'game_panel.html', {
             'game': game,
             'feedback': feedback,
