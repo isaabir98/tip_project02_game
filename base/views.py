@@ -77,28 +77,37 @@ def game_view(request):
         student_name = request.POST.get('studentName', None)
         
         if student_name:
+            # Store the student name in the session
+            request.session['student_name'] = student_name
             print(f"Received student name: {student_name}")
             return render(request, 'game_view.html', {'student_name': student_name})
         else:
             return HttpResponse("No student name provided", status=400)
     
-    return render(request, 'game_view.html')
+    # Retrieve the student name from the session if it exists
+    student_name = request.session.get('student_name', None)
+    
+    return render(request, 'game_view.html', {'student_name': student_name})
 
 
 def game_panel(request, game_type):
+    # Fetch the game based on the game type
     game = get_object_or_404(Game, game_type=game_type.capitalize())
 
     # Define mock answers for each question
     mock_answers = {
-        1: ["6", "37", "9"],  # Mock answers for question 1
-        2: ["15", "26", "20"],  # Mock answers for question 2
-        3: ["14", "12", "30"],  # Mock answers for question 3
+        1: ["6", "37", "9"],
+        2: ["15", "26", "20"],
+        3: ["14", "12", "30"],
     }
 
     questions = game.questions
+    correct_answers = []  # List to hold correct answers
+
     for question in questions:
         question_id = question['id']
-        correct_answer = game.answers[question_id - 1]  # Assuming answers are in the same order as questions
+        correct_answer = game.answers[question_id - 1]  # Adjust if IDs are not zero-based
+        correct_answers.append(correct_answer)  # Add to correct answers list
         options = list(set([correct_answer] + mock_answers[question_id]))  # Ensure unique options
         random.shuffle(options)
         question['options'] = options
@@ -107,14 +116,11 @@ def game_panel(request, game_type):
         user_answers = []
         feedback = []
 
-        # Collect user answers based on unique question identifiers
         for question in questions:
             question_id = question['id']
-            user_answer = request.POST.get(f'answers_{game.id}_{question_id}', None)  # Default to None if not found
+            user_answer = request.POST.get(f'answers_{game.id}_{question_id}', None)
             user_answers.append(user_answer)
 
-            # Compare user answer with the correct answer
-            correct_answer = game.answers[question_id - 1]
             if user_answer is None:
                 feedback.append(f"Question {question_id}: Not answered.")
             elif user_answer == correct_answer:
@@ -129,9 +135,10 @@ def game_panel(request, game_type):
             'feedback': feedback,
             'user_answers': user_answers,
             'questions': questions,
+            'correct_answers': correct_answers,  # Add this line
         })
 
-    return render(request, 'game_panel.html', {'game': game, 'questions': questions})
+    return render(request, 'game_panel.html', {'game': game, 'questions': questions, 'correct_answers': correct_answers})  # Add this line
 
 def teachers_panel(request):
     feedback_list = Feedback.objects.all()  

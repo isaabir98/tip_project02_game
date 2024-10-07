@@ -157,6 +157,11 @@
           </div>
         </div>
         {% endfor %}
+        <input
+          type="hidden"
+          id="correctAnswers"
+          value="{{ correct_answers|join:', ' }}"
+        />
         <button type="submit" class="submit-btn">Submit Answers</button>
       </form>
 
@@ -207,8 +212,10 @@
       };
 
       function showFeedback() {
-        // Define the correct answers for the questions
-        const correctAnswers = ["Option 1", "Option 2", "Option 3"]; // Update this array with the correct answers
+        // Get the correct answers from the hidden input
+        const correctAnswers = document
+          .getElementById("correctAnswers")
+          .value.split(", ");
         const feedbackMessages = [];
         const questions = document.querySelectorAll(".question");
 
@@ -226,9 +233,11 @@
               feedbackMessages.push(
                 `Question ${
                   index + 1
-                }: Incorrect. The correct answer is ${correctAnswer}.`,
+                }: Incorrect. The correct answer is "${correctAnswer}".`,
               );
             }
+          } else {
+            feedbackMessages.push(`Question ${index + 1}: No answer selected.`);
           }
         });
 
@@ -242,7 +251,7 @@
         if (param === "Next") {
           window.location.href = `/game_view/`; // Change to the correct URL
         } else {
-          window.location.href = `exit_url`; // Change to the correct exit URL
+          window.location.href = `/`; // Change to the correct exit URL
         }
       }
     </script>
