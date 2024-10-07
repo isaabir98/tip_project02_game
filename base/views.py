@@ -3,7 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+from django.shortcuts import render, get_object_or_404
+import random
 from base.forms import UserCreationForm
 from .models import Feedback, Game, User  
 
@@ -84,41 +85,39 @@ def game_view(request):
     return render(request, 'game_view.html')
 
 
-from django.shortcuts import render, get_object_or_404
-import random
-
 def game_panel(request, game_type):
     game = get_object_or_404(Game, game_type=game_type.capitalize())
 
     # Define mock answers for each question
     mock_answers = {
-        1: ["6", "37", "8"],  # Mock answers for question 1
-        2: ["15", "26", "15"],  # Mock answers for question 2
-        3: ["14", "12", "23"],  # Mock answers for question 3
+        1: ["6", "37", "9"],  # Mock answers for question 1
+        2: ["15", "26", "20"],  # Mock answers for question 2
+        3: ["14", "12", "30"],  # Mock answers for question 3
     }
 
     questions = game.questions
     for question in questions:
         question_id = question['id']
         correct_answer = game.answers[question_id - 1]  # Assuming answers are in the same order as questions
-        options = [correct_answer] + mock_answers[question_id]
+        options = list(set([correct_answer] + mock_answers[question_id]))  # Ensure unique options
         random.shuffle(options)
         question['options'] = options
 
     if request.method == 'POST':
         user_answers = []
-        correct_answers = game.answers  # Correct answers from the game
         feedback = []
 
         # Collect user answers based on unique question identifiers
         for question in questions:
             question_id = question['id']
-            user_answer = request.POST.get(f'answers_{game.id}_{question_id}')
+            user_answer = request.POST.get(f'answers_{game.id}_{question_id}', None)  # Default to None if not found
             user_answers.append(user_answer)
 
             # Compare user answer with the correct answer
             correct_answer = game.answers[question_id - 1]
-            if user_answer == correct_answer:
+            if user_answer is None:
+                feedback.append(f"Question {question_id}: Not answered.")
+            elif user_answer == correct_answer:
                 feedback.append(f"Question {question_id}: Correct!")
             else:
                 feedback.append(f"Question {question_id}: Incorrect. The correct answer is {correct_answer}.")

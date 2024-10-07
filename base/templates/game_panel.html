@@ -67,26 +67,66 @@
         background-color: #e64a19;
       }
 
-      .feedback {
-        margin-top: 20px;
-        font-size: 1.2rem;
+      /* Modal (Popup) Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
       }
+
+      .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        border-radius: 10px;
+      }
+
+      .modal-content h2 {
+        font-size: 1.5rem;
+        color: #333;
+      }
+
+      .modal-content p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+      }
+
+      .button-group button {
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+      }
+
+      .next-btn {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .exit-btn {
+        background-color: #f44336;
+        color: white;
+      }
+
       .timer {
         border-style: solid;
         border-radius: 10px 0px 10px 0px;
         width: 71px;
         height: 34px;
-      }
-
-      @keyframes bounceIn {
-        from {
-          opacity: 0;
-          transform: scale(0.3);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
       }
     </style>
   </head>
@@ -96,7 +136,7 @@
     </div>
     <h1>MCQ Quiz Game</h1>
     <div class="game-container">
-      <form method="POST">
+      <form id="quizForm">
         {% csrf_token %} {% for question in questions %}
         <div class="question">
           <p>{{ question.question }}</p>
@@ -120,54 +160,90 @@
         <button type="submit" class="submit-btn">Submit Answers</button>
       </form>
 
-      {% if feedback %}
-      <div class="feedback">
-        <h2>Feedback:</h2>
-        <ul>
-          {% for feedback_item in feedback %}
-          <li>{{ feedback_item }}</li>
-          {% endfor %}
-        </ul>
+      <!-- Modal Popup for Feedback -->
+      <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+          <h2>Feedback</h2>
+          <p id="feedbackMessage"></p>
+          <div class="button-group">
+            <button class="next-btn" onclick="routeMe('Next')">Next</button>
+            <button class="exit-btn" onclick="routeMe('Exit')">Exit</button>
+          </div>
+        </div>
       </div>
-      {% endif %}
     </div>
+
     <script>
-      var startTime; // to keep track of the start time
-      var stopwatchInterval; // to keep track of the interval
-      var elapsedPausedTime = 0; // to keep track of the elapsed time while stopped
+      // Stopwatch script
+      var startTime;
+      var stopwatchInterval;
+      var elapsedPausedTime = 0;
       startStopwatch();
       function startStopwatch() {
         if (!stopwatchInterval) {
-          startTime = new Date().getTime() - elapsedPausedTime; // get the starting time by subtracting the elapsed paused time from the current time
-          stopwatchInterval = setInterval(updateStopwatch, 1000); // update every second
+          startTime = new Date().getTime() - elapsedPausedTime;
+          stopwatchInterval = setInterval(updateStopwatch, 1000);
         }
       }
 
-      function stopStopwatch() {
-        clearInterval(stopwatchInterval); // stop the interval
-        elapsedPausedTime = new Date().getTime() - startTime; // calculate elapsed paused time
-        stopwatchInterval = null; // reset the interval variable
-      }
-
-      function resetStopwatch() {
-        stopStopwatch(); // stop the interval
-        elapsedPausedTime = 0; // reset the elapsed paused time variable
-        document.getElementById("stopwatch").innerHTML = "00:00:00"; // reset the display
-      }
-
       function updateStopwatch() {
-        var currentTime = new Date().getTime(); // get current time in milliseconds
-        var elapsedTime = currentTime - startTime; // calculate elapsed time in milliseconds
-        var seconds = Math.floor(elapsedTime / 1000) % 60; // calculate seconds
-        var minutes = Math.floor(elapsedTime / 1000 / 60) % 60; // calculate minutes
-        var hours = Math.floor(elapsedTime / 1000 / 60 / 60); // calculate hours
-        var displayTime = pad(hours) + ":" + pad(minutes) + ":" + pad(seconds); // format display time
-        document.getElementById("stopwatch").innerHTML = displayTime; // update the display
+        var currentTime = new Date().getTime();
+        var elapsedTime = currentTime - startTime;
+        var seconds = Math.floor(elapsedTime / 1000) % 60;
+        var minutes = Math.floor(elapsedTime / 1000 / 60) % 60;
+        var hours = Math.floor(elapsedTime / 1000 / 60 / 60);
+        var displayTime = pad(hours) + ":" + pad(minutes) + ":" + pad(seconds);
+        document.getElementById("stopwatch").innerHTML = displayTime;
       }
 
       function pad(number) {
-        // add a leading zero if the number is less than 10
         return (number < 10 ? "0" : "") + number;
+      }
+
+      // Show feedback modal on form submission
+      document.getElementById("quizForm").onsubmit = function (event) {
+        event.preventDefault(); // Prevent form submission
+        showFeedback();
+      };
+
+      function showFeedback() {
+        // Define the correct answers for the questions
+        const correctAnswers = ["Option 1", "Option 2", "Option 3"]; // Update this array with the correct answers
+        const feedbackMessages = [];
+        const questions = document.querySelectorAll(".question");
+
+        // Check user answers and generate feedback
+        questions.forEach((question, index) => {
+          const selectedOption = question.querySelector(
+            'input[type="radio"]:checked',
+          );
+          const correctAnswer = correctAnswers[index];
+
+          if (selectedOption) {
+            if (selectedOption.value === correctAnswer) {
+              feedbackMessages.push(`Question ${index + 1}: Correct!`);
+            } else {
+              feedbackMessages.push(
+                `Question ${
+                  index + 1
+                }: Incorrect. The correct answer is ${correctAnswer}.`,
+              );
+            }
+          }
+        });
+
+        // Display feedback in modal
+        document.getElementById("feedbackMessage").innerText =
+          feedbackMessages.join("\n");
+        document.getElementById("feedbackModal").style.display = "block"; // Show the modal
+      }
+
+      function routeMe(param) {
+        if (param === "Next") {
+          window.location.href = `/game_view/`; // Change to the correct URL
+        } else {
+          window.location.href = `exit_url`; // Change to the correct exit URL
+        }
       }
     </script>
   </body>
