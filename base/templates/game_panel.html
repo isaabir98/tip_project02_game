@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quiz Game</title>
+    <title>MCQ Quiz Game</title>
     <style>
       body {
         background-color: #ffeb3b;
@@ -32,17 +32,23 @@
         animation: bounceIn 0.5s ease-out;
       }
 
-      input[type="text"] {
-        font-size: 1.2rem;
-        padding: 10px;
-        border-radius: 10px;
-        border: none;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-        transition: background-color 0.3s;
+      .options-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
       }
 
-      input[type="text"]:focus {
-        background-color: #fff3e0;
+      .option {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        width: 100%;
+      }
+
+      input[type="radio"] {
+        margin-right: 10px;
       }
 
       .submit-btn {
@@ -66,16 +72,6 @@
         font-size: 1.2rem;
       }
 
-      .correct {
-        color: green;
-        animation: fadeIn 0.5s ease-in-out;
-      }
-
-      .incorrect {
-        color: red;
-        animation: shake 0.5s ease;
-      }
-
       @keyframes bounceIn {
         from {
           opacity: 0;
@@ -86,48 +82,45 @@
           transform: scale(1);
         }
       }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes shake {
-        0% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-5px);
-        }
-        50% {
-          transform: translateX(5px);
-        }
-        75% {
-          transform: translateX(-5px);
-        }
-        100% {
-          transform: translateX(0);
-        }
-      }
     </style>
   </head>
   <body>
-    <h1>Quiz Game</h1>
-
+    <h1>MCQ Quiz Game</h1>
     <div class="game-container">
       <form method="POST">
-        {% csrf_token %} {% for question in game.questions %}
+        {% csrf_token %} {% for question in questions %}
         <div class="question">
-          <p>{{ question }}</p>
-          <input type="text" name="answers" required />
+          <p>{{ question.question }}</p>
+          <div class="options-container">
+            {% for option in question.options %}
+            <div class="option">
+              <label>
+                <input
+                  type="radio"
+                  name="answers_{{ game.id }}_{{ question.id }}"
+                  value="{{ option }}"
+                  required
+                />
+                {{ option }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
         </div>
         {% endfor %}
         <button type="submit" class="submit-btn">Submit Answers</button>
       </form>
+
+      {% if feedback %}
+      <div class="feedback">
+        <h2>Feedback:</h2>
+        <ul>
+          {% for feedback_item in feedback %}
+          <li>{{ feedback_item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
     </div>
   </body>
 </html>

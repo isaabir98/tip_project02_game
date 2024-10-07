@@ -84,27 +84,47 @@ def game_view(request):
     return render(request, 'game_view.html')
 
 
+from django.shortcuts import render, get_object_or_404
+import random
+
 def game_panel(request, game_type):
-    print('work')
     game = get_object_or_404(Game, game_type=game_type.capitalize())
-    print(game)
+    
+    # Define mock answers for each question
+    mock_answers = {
+        1: ["6", "37", "8"],  # Mock answers for question 1
+        2: ["15", "26", "15"],  # Mock answers for question 2
+        3: ["14", "12", "23"],  # Mock answers for question 3
+    }
+    
+    questions = game.questions
+    for question in questions:
+        question_id = question['id']
+        # Get the correct answer from the game.answers field (make sure it's correctly aligned)
+        correct_answer = game.answers[question_id - 1]  # Assuming answers are in the same order as questions
+        options = [correct_answer] + mock_answers[question_id]  # Combine correct answer with mock answers
+        random.shuffle(options)  # Shuffle options
+        question['options'] = options  # Add shuffled options to the question
+
     if request.method == 'POST':
-        user_answers = request.POST.getlist('answers')
-        print(user_answers)
-        correct_answers = game.answers
+        user_answers = request.POST.getlist('answers')  # Get user answers
+        correct_answers = game.answers  # Get correct answers
         feedback = []
+        
         for i, (user_answer, correct_answer) in enumerate(zip(user_answers, correct_answers)):
-            if user_answer.strip().lower() == correct_answer.lower():
-                feedback.append(f"Question {i+1}: Correct!")
+            if user_answer.strip() == correct_answer:
+                feedback.append(f"Question {i + 1}: Correct!")
             else:
-                feedback.append(f"Question {i+1}: Incorrect. The correct answer is {correct_answer}.")
+                feedback.append(f"Question {i + 1}: Incorrect. The correct answer is {correct_answer}.")
+        
         return render(request, 'game_panel.html', {
             'game': game,
             'feedback': feedback,
             'user_answers': user_answers,
+            'questions': questions,  # Pass questions to the template
         })
 
-    return render(request, 'game_panel.html', {'game': game})
+    return render(request, 'game_panel.html', {'game': game, 'questions': questions})
 
 
 def teachers_panel(request):
