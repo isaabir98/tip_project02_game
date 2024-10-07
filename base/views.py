@@ -89,43 +89,50 @@ import random
 
 def game_panel(request, game_type):
     game = get_object_or_404(Game, game_type=game_type.capitalize())
-    
+
     # Define mock answers for each question
     mock_answers = {
         1: ["6", "37", "8"],  # Mock answers for question 1
         2: ["15", "26", "15"],  # Mock answers for question 2
         3: ["14", "12", "23"],  # Mock answers for question 3
     }
-    
+
     questions = game.questions
     for question in questions:
         question_id = question['id']
-        # Get the correct answer from the game.answers field (make sure it's correctly aligned)
         correct_answer = game.answers[question_id - 1]  # Assuming answers are in the same order as questions
-        options = [correct_answer] + mock_answers[question_id]  # Combine correct answer with mock answers
-        random.shuffle(options)  # Shuffle options
-        question['options'] = options  # Add shuffled options to the question
+        options = [correct_answer] + mock_answers[question_id]
+        random.shuffle(options)
+        question['options'] = options
 
     if request.method == 'POST':
-        user_answers = request.POST.getlist('answers')  # Get user answers
-        correct_answers = game.answers  # Get correct answers
+        user_answers = []
+        correct_answers = game.answers  # Correct answers from the game
         feedback = []
-        
-        for i, (user_answer, correct_answer) in enumerate(zip(user_answers, correct_answers)):
-            if user_answer.strip() == correct_answer:
-                feedback.append(f"Question {i + 1}: Correct!")
+
+        # Collect user answers based on unique question identifiers
+        for question in questions:
+            question_id = question['id']
+            user_answer = request.POST.get(f'answers_{game.id}_{question_id}')
+            user_answers.append(user_answer)
+
+            # Compare user answer with the correct answer
+            correct_answer = game.answers[question_id - 1]
+            if user_answer == correct_answer:
+                feedback.append(f"Question {question_id}: Correct!")
             else:
-                feedback.append(f"Question {i + 1}: Incorrect. The correct answer is {correct_answer}.")
-        
+                feedback.append(f"Question {question_id}: Incorrect. The correct answer is {correct_answer}.")
+
+        print("User's answers:", user_answers)
+
         return render(request, 'game_panel.html', {
             'game': game,
             'feedback': feedback,
             'user_answers': user_answers,
-            'questions': questions,  # Pass questions to the template
+            'questions': questions,
         })
 
     return render(request, 'game_panel.html', {'game': game, 'questions': questions})
-
 
 def teachers_panel(request):
     feedback_list = Feedback.objects.all()  
