@@ -1,0 +1,169 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Division for Kids</title>
+    <style>
+        body {
+            font-family: 'MV Boli', sans-serif;
+            text-align: center;
+            background-image: url('https://i.pinimg.com/236x/5f/05/01/5f0501ad544a5c27409be471d285b209.jpg');
+            background-size: 500px 300px;
+            background-position: 850px 180px;
+            background-repeat: no-repeat;
+            padding-top: 50px;
+        }
+        .question-box {
+            background-color: lightblue; 
+            padding: 30px;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 500px;
+            margin-left: -200px;
+        }
+        h1 {
+            color: #ff6347;
+        }
+        p {
+            font-size: 24px;
+            color: #333;
+        }
+        input[type="number"] {
+            width: 150px;
+            padding: 15px;
+            font-size: 24px;
+            border-radius: 10px;
+            border: 2px solid #ff6347;
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 20px;
+            margin-top: 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #feedback {
+            font-size: 28px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .completed {
+            color: #ff6347;
+        }
+        /* Animation styles */
+        .score {
+            font-size: 36px;
+            font-weight: bold;
+            animation: scaleUp 1s ease-in-out;
+        }
+        .win-message {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff6347;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes scaleUp {
+            0% {
+                transform: scale(1);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="question-box">
+        <h1>Let's Do Some Division!</h1>
+        <p id="question">What is 10 ÷ 2?</p>
+        <input type="number" id="answer" placeholder="Enter your answer" />
+        <br />
+        <button onclick="checkAnswer()">Check Answer</button>
+        <p id="feedback"></p>
+    </div>
+
+    <script>
+        const problems = [
+            { question: 'What is 10 ÷ 2?', answer: 5 },
+            { question: 'What is 20 ÷ 4?', answer: 5 },
+            { question: 'What is 15 ÷ 3?', answer: 5 },
+            { question: 'What is 9 ÷ 3?', answer: 3 },
+            { question: 'What is 8 ÷ 2?', answer: 4 }
+        ];
+
+        let currentProblem = 0;
+        let score = 0; // Initialize score
+
+        function checkAnswer() {
+            const answer = document.getElementById("answer").value;
+            const feedback = document.getElementById("feedback");
+
+            if (answer == problems[currentProblem].answer) {
+                feedback.textContent = "Yay! That's correct!";
+                feedback.style.color = "green";
+                score++; // Increase score for correct answer
+            } else {
+                feedback.textContent = "Oops! That's incorrect!";
+                feedback.style.color = "red";
+            }
+
+            currentProblem++; // Move to the next problem
+
+            // Delay the transition to the next question for better user experience
+            setTimeout(() => {
+                feedback.textContent = ''; // Clear feedback
+                if (currentProblem < problems.length) {
+                    document.getElementById("question").textContent = problems[currentProblem].question; // Update question
+                    document.getElementById("answer").value = ''; // Clear input
+                } else {
+                    // Determine feedback based on the score
+                    let feedbackMessage = '';
+                    let winMessage = '';
+                    if (score === problems.length) {
+                        feedbackMessage = 'Amazing! You got all answers correct!';
+                        winMessage = '<p class="win-message">🎉 Congratulations! You are a Division Master! 🎉</p>';
+                    } else if (score >= problems.length / 2) {
+                        feedbackMessage = 'Great job! You did well!';
+                    } else {
+                        feedbackMessage = 'Keep practicing! You can improve!';
+                    }
+
+                    document.querySelector('.question-box').innerHTML = `
+                        <h1>Your Score</h1>
+                        <p class="score">You scored ${score} out of ${problems.length}!</p>
+                        ${winMessage}
+                        <p>${feedbackMessage}</p>
+                    `;
+                }
+            }, 1000);
+        }
+    </script>
+
+</body>
+</html>
