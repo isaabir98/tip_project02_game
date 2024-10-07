@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Selection Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #4a4a4a;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .option-box {
+            background-color: #6c63ff;
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .option-box:hover {
+            background-color: #5753d1;
+        }
+        .option-box a {
+            text-decoration: none;
+            color: white;
+        }
+        .selected-message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #4a90e2;
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Choose an option</h1>
+        <div class="options">
+            <div class="option-box">
+                <a href="{% url 'game_panel' game_type='option 1' %}">Option 1</a>
+            </div>
+            <div class="option-box">
+                <a href="{% url 'game_panel' game_type='option 2' %}">Option 2</a>
+            </div>
+            <div class="option-box">
+                <a href="{% url 'game_panel' game_type='option 3' %}">Option 3</a>
+            </div>
+            <div class="option-box">
+                <a href="{% url 'game_panel' game_type='option 4' %}">Option 4</a>
+            </div>
+        </div>
+
+        <div class="selected-message" id="selected-message">
+            <!-- Message will appear here -->
+        </div>
+    </div>
+
+    <script>
+        // Get all the option boxes
+        const optionBoxes = document.querySelectorAll('.option-box');
+        const selectedMessage = document.getElementById('selected-message');
+
+        // Add click event handler to each box
+        optionBoxes.forEach(box => {
+            box.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default link navigation
+                const selectedOption = this.textContent.trim(); // Get the selected option text
+                
+                // Display the selected option to the user
+                selectedMessage.textContent = `${selectedOption} has been selected!`;
+                selectedMessage.style.display = 'block';
+
+                // Optionally, you can implement your own routing logic here
+                // For example, using window.location.href to navigate:
+                // window.location.href = this.querySelector('a').href;
+            });
+        });
+    </script>
+
+</body>
+</html>

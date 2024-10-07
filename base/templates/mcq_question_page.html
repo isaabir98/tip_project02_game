@@ -4,8 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+          background: linear-gradient(to right, #b3ffab, #12fff7);
+          font-family: "Comic Sans MS", sans-serif;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+  
+        h1 {
+          color: #ff6f61;
+          font-size: 3rem;
+          text-shadow: 2px 2px #ffe4e1;
+          margin-bottom: 30px;
+        }
+  
+        .categories {
+          display: flex;
+          gap: 20px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+  
+        .category-box {
+          background-color: #ffde59;
+          width: 200px;
+          height: 200px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 1.5rem;
+          color: #fff;
+          border: 3px solid #f77f00;
+          border-radius: 15px;
+          cursor: pointer;
+          transition: transform 0.3s ease, background-color 0.3s ease;
+          box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+        }
+  
+        .category-box:hover {
+          transform: translateY(-10px);
+          background-color: #f77f00;
+        }
+  
+        .category-box:active {
+          transform: scale(0.95);
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+  
+        /* Add category-specific colors */
+        .category-box.multiplication {
+          background-color: #ff6f61;
+        }
+  
+        .category-box.addition {
+          background-color: #ffb347;
+        }
+  
+        .category-box.subtraction {
+          background-color: #b0e57c;
+        }
+  
+        .category-box.division {
+          background-color: #87ceeb;
+        }
+  
+        .category-box:hover.multiplication {
+          background-color: #ff9a76;
+        }
+  
+        .category-box:hover.addition {
+          background-color: #ffcc70;
+        }
+  
+        .category-box:hover.subtraction {
+          background-color: #c6ffdd;
+        }
+  
+        .category-box:hover.division {
+          background-color: #b0e0e6;
+        }
+      </style>
+    </head>
 </head>
 <body>
-    <h1></h1>
+    <h1>Choose an option</h1>
+    <div class="options">
+        <div class="option 1-box ">
+          <a href="{% url 'game_panel' game_type='option 1' %}"
+            >option 1</a
+          >
+        </div>
+        <div class="option 2-box ">
+          <a href="{% url 'game_panel' game_type='option 2' %}">option 2</a>
+        </div>
+        <div class="option 3-box ">
+          <a href="{% url 'game_panel' game_type='option 3' %}">option 3 </a>
+        </div>
+        <div class="option 4-box ">
+          <a href="{% url 'game_panel' game_type='option 4' %}">option 4</a>
+        </div>
+      </div>
+  
+      <script>
+        // Add click event handler if needed for future routing
+        document.querySelectorAll(".option-box").forEach((box) => {
+          box.addEventListener("click", function () {
+            const category = this.textContent.trim();
+            console.log(`${category} clicked`);
+            // You can add navigation to other pages here
+          });
+        });
+      </script>
 </body>
 </html>
