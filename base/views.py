@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.shortcuts import render, get_object_or_404
@@ -59,13 +60,15 @@ def admin_login(request):
             return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
     return JsonResponse({'success': False, 'message': 'Invalid request'})
 
-
 def create_user(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('success_url')  
+            # Add a success message
+            messages.success(request, 'User created successfully!')
+            # Redirect to the admin panel
+            return redirect('/admin/')
     else:
         form = UserCreationForm()  
 
@@ -106,8 +109,8 @@ def game_panel(request, game_type):
 
     for question in questions:
         question_id = question['id']
-        correct_answer = game.answers[question_id - 1]  # Adjust if IDs are not zero-based
-        correct_answers.append(correct_answer)  # Add to correct answers list
+        correct_answer = game.answers[question_id - 1] 
+        correct_answers.append(correct_answer)  
         options = list(set([correct_answer] + mock_answers[question_id]))  # Ensure unique options
         random.shuffle(options)
         question['options'] = options
